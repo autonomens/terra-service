@@ -1,0 +1,15 @@
+# Python
+*.pyc
+
+# Django local settings
+/src/project/settings/local.py
+
+# Docker local settings
+docker.env
+
+# IDE settings
+/.vscode
+
+# Virtualenv
+/venv/
+
