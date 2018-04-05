@@ -1,5 +1,7 @@
 psycopg2>=2.7,<2.8 --no-binary psycopg2
 Django>=2.0,<2.1.0  # NOT LTS
+djangorestframework>=3.7,<3.8
+SPARQLWrapper>=1.8,<1.9
 
 # development
 django-debug-toolbar>=1.9,<1.10

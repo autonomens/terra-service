@@ -41,6 +41,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'rest_framework',
+    'tr_geoinsee',
 )
 
 MIDDLEWARE = (
@@ -103,3 +105,5 @@ MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
 
 # Just to be easily override by children conf files.
 LOGGING = copy.deepcopy(DEFAULT_LOGGING)
+
+INSEE_SPARQL = 'http://rdf.insee.fr/sparql'
