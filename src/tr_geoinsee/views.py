@@ -90,4 +90,60 @@ class StateViewSet(SparQLViewSet):
         return Response(self.sparql_query(self.get_counties_query(pk)))
 
 
+class CountyViewSet(SparQLViewSet):
+    def get_detail_query(self, pk=None):
+        query = '''
+            PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX igeo:<http://rdf.insee.fr/def/geo#>
+            SELECT ?label ?value WHERE {{
+                    ?state rdf:type igeo:Departement .
+                    ?state igeo:nom ?name .
+                    ?state igeo:vivant true .
+                    ?state igeo:codeINSEE ?insee_code .
+                    ?state ?prop ?value .
+                    ?prop <http://www.w3.org/2000/01/rdf-schema#label> ?label
+                    FILTER( "{}" = STR(?insee_code)) .
+            }}
+            '''
+        return query.format(pk)
+
+    def get_list_query(self):
+        return '''
+            PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX igeo:<http://rdf.insee.fr/def/geo#>
+            SELECT ?name ?insee_code WHERE {
+                ?state rdf:type igeo:Departement .
+                    ?state igeo:nom ?name .
+                    ?state igeo:vivant true .
+                    ?state igeo:codeINSEE ?insee_code .
+            }
+            '''
+
+    def get_townships_query(self, pk):
+        query = '''
+            PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX igeo:<http://rdf.insee.fr/def/geo#>
+            SELECT ?code_insee ?name WHERE {{
+                    ?township_id <http://rdf.insee.fr/def/geo#subdivisionDe> ?county .
+                    ?township_id <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdf.insee.fr/def/geo#Commune> .
+                    ?township_id <http://rdf.insee.fr/def/geo#nom> ?name .
+                    ?township_id <http://rdf.insee.fr/def/geo#codeINSEE> ?code_insee .
+                    ?county igeo:codeINSEE ?county_insee_code
+                    FILTER( "{}" = STR(?county_insee_code))
+            }}
+        '''
+        return query.format(pk)
         
+    @detail_route(url_path='townships')
+    def townships(self, request, pk):
+        return Response(self.sparql_query(
+            '''
+            PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX igeo:<http://rdf.insee.fr/def/geo#>
+            SELECT ?a ?b WHERE {
+                <http://id.insee.fr/geo/mouvements/279> ?a ?b
+            }
+            ''')
+        )
+
+        return Response(self.sparql_query(self.get_townships_query(pk)))
