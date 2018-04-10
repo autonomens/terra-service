@@ -16,6 +16,16 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
 
     def get_item_url(self, identifier):
         raise NotImplementedError("Please Implement this method")
+    
+    def clean_fields(self, item):
+        field_list = {
+            'codeINSEE': 'insee',
+            'nom': 'nom',
+            'url': 'url',
+        }
+        return {
+            new_field: item[field] for field, new_field in field_list.items() if field in item
+        }
 
     def update_items_url(self, items, url_name):
         if isinstance(items, list) and url_name:
@@ -23,7 +33,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
                 item.update(
                     {
                         'url': reverse(url_name,
-                                       args=[item.get('insee_code'), ],
+                                       args=[item.get('insee'), ],
                                        request=self.request)
                     }
                 )
@@ -60,8 +70,8 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
         result = {}
         for item in results.get('results', {}).get('bindings', {}):
             result.update(SparQLUtils.get_single_item_values(item))
-
-        serializer = SparQLSerializer(result)
+        
+        serializer = SparQLSerializer(self.clean_fields(result))
         return serializer.data
 
     def list(self, request):
@@ -80,11 +90,11 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def population_by_date(self, request, pk):
         query = '''
             SELECT ?date ?population WHERE {{
-                    ?township igeo:codeINSEE ?insee_code .
+                    ?township igeo:codeINSEE ?insee .
                     ?township demo:population ?demo .
                     ?demo demo:date ?date .
                     ?demo demo:populationTotale ?population .
-                    FILTER( "{}" = STR(?insee_code)) .
+                    FILTER( "{}" = STR(?insee)) .
             }} ORDER BY DESC(?date)
         '''
         results = SparQLUtils.sparql_query(query.format(pk))
@@ -103,10 +113,10 @@ class StateViewSet(SparQLViewSet):
                     ?state rdf:type igeo:Region .
                     ?state igeo:nom ?name .
                     ?state igeo:vivant true .
-                    ?state igeo:codeINSEE ?insee_code .
+                    ?state igeo:codeINSEE ?insee .
                     ?prop rdfschema:label ?label .
                     ?state ?prop ?value
-                    FILTER( "{}" = STR(?insee_code)) .
+                    FILTER( "{}" = STR(?insee)) .
                     FILTER( isLiteral(?value) )
             }}
             '''
@@ -114,21 +124,21 @@ class StateViewSet(SparQLViewSet):
 
     def get_list_query(self):
         return '''
-            SELECT ?identifier ?name ?insee_code WHERE {
+            SELECT ?identifier ?name ?insee WHERE {
                     ?identifier rdf:type igeo:Region .
                     ?identifier igeo:nom ?name .
                     ?identifier igeo:vivant true .
-                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?identifier igeo:codeINSEE ?insee .
             }
             '''
 
     def get_counties_query(self, pk):
         query = '''
-            SELECT ?identifier ?name ?insee_code WHERE {{
+            SELECT ?identifier ?name ?insee WHERE {{
                     ?identifier igeo:subdivisionDe ?state .
                     ?identifier rdf:type igeo:Departement .
                     ?identifier igeo:nom ?name .
-                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?identifier igeo:codeINSEE ?insee .
                     ?state igeo:codeINSEE ?state_insee_code
                     FILTER( "{}" = STR(?state_insee_code))
             }}
@@ -154,10 +164,10 @@ class CountyViewSet(SparQLViewSet):
                     ?county rdf:type igeo:Departement .
                     ?county igeo:nom ?name .
                     ?county igeo:vivant true .
-                    ?county igeo:codeINSEE ?insee_code .
+                    ?county igeo:codeINSEE ?insee .
                     ?prop rdfschema:label ?label .
                     ?county ?prop ?value
-                    FILTER( "{}" = STR(?insee_code)) .
+                    FILTER( "{}" = STR(?insee)) .
                     FILTER( isLiteral(?value) )
             }}
             '''
@@ -165,21 +175,21 @@ class CountyViewSet(SparQLViewSet):
 
     def get_list_query(self):
         return '''
-            SELECT ?identifier ?name ?insee_code WHERE {
+            SELECT ?identifier ?name ?insee WHERE {
                     ?identifier rdf:type igeo:Departement .
                     ?identifier igeo:nom ?name .
                     ?identifier igeo:vivant true .
-                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?identifier igeo:codeINSEE ?insee .
             }
             '''
 
     def get_townships_query(self, pk):
         query = '''
-            SELECT ?identifier ?name ?insee_code WHERE {{
+            SELECT ?identifier ?name ?insee WHERE {{
                     ?identifier igeo:subdivisionDe ?county .
                     ?identifier rdf:type igeo:Commune .
                     ?identifier igeo:nom ?name .
-                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?identifier igeo:codeINSEE ?insee .
                     ?county igeo:codeINSEE ?county_insee_code
                     FILTER( "{}" = STR(?county_insee_code))
             }}
@@ -202,10 +212,10 @@ class TownshipViewset(SparQLViewSet):
                     ?township rdf:type igeo:Commune .
                     ?township igeo:nom ?name .
                     ?township igeo:vivant true .
-                    ?township igeo:codeINSEE ?insee_code .
+                    ?township igeo:codeINSEE ?insee .
                     ?prop rdfschema:label ?label .
                     ?township ?prop ?value
-                    FILTER( "{}" = STR(?insee_code)) .
+                    FILTER( "{}" = STR(?insee)) .
                     FILTER( isLiteral(?value) )
             }}
             '''
@@ -213,10 +223,10 @@ class TownshipViewset(SparQLViewSet):
 
     def get_list_query(self):
         return '''
-            SELECT ?identifier ?name ?insee_code WHERE {
+            SELECT ?identifier ?name ?insee WHERE {
                     ?identifier rdf:type igeo:Commune .
                     ?identifier igeo:nom ?name .
                     ?identifier igeo:vivant true .
-                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?identifier igeo:codeINSEE ?insee .
             }
         '''
