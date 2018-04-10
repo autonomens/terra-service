@@ -17,10 +17,14 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def get_item_url(self, identifier):
         raise NotImplementedError("Please Implement this method")
 
-    def pre_update_items(self, items):
-        pass
+    def update_items_url(self, items, url_name):
+        if isinstance(items, list) and url_name:
+            for item in items:
+                item.update({
+                    'url': reverse(url_name, args=[item.get('insee_code'), ], request=self.request)
+                })
 
-    def sparql_query(self, query, page=1, many=False):
+    def sparql_query(self, query, page=1, many=False, item_url_name=None):
         results = SparQLUtils.sparql_query(query, self.page_size, self.page_size * (page - 1))
 
         fields = SparQLUtils.get_query_fields(results)
@@ -32,7 +36,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
                 resultitem.update(SparQLUtils.get_fields_values(fields, item))
             resultlist = list(resultlist.values())
 
-            self.pre_update_items(resultlist)
+            self.update_items_url(resultlist, item_url_name)
             serializer = SparQLSerializer(resultlist, many=True)
 
             return {
@@ -48,12 +52,16 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
         for item in results.get('results', {}).get('bindings', {}):
             result.update(SparQLUtils.get_single_item_values(item))
 
-        self.pre_update_items(result)
         serializer = SparQLSerializer(result)
         return serializer.data
     
     def list(self, request):
-        return Response(self.sparql_query(self.get_list_query(), self.get_page(request), True))
+        return Response(self.sparql_query(
+            self.get_list_query(),
+            self.get_page(request),
+            True,
+            '{}-detail'.format(self.basename)
+            ))
 
     def retrieve(self, request, pk=None):
         return Response(self.sparql_query(self.get_detail_query(pk), self.get_page(request)))
@@ -99,18 +107,12 @@ class StateViewSet(SparQLViewSet):
         '''
         return query.format(pk)
 
-    def pre_update_items(self, items):
-        if isinstance(items, dict):
-            pass
-        elif isinstance(items, list):
-            for item in items:
-                item.update({
-                    'url': reverse('state-detail', args=[item.get('insee_code'), ], request=self.request)
-                })
-
     @detail_route(url_path='counties')
     def counties(self, request, pk):
-        return Response(self.sparql_query(self.get_counties_query(pk), True))
+        return Response(self.sparql_query(
+            self.get_counties_query(pk),
+            self.get_page(request),
+            True, 'county-detail'))
 
     def get_item_url(self, identifier):
         return reverse('county-detail', args=[identifier, ])
@@ -144,31 +146,42 @@ class CountyViewSet(SparQLViewSet):
     def get_townships_query(self, pk):
         query = '''
             SELECT ?identifier ?name ?insee_code WHERE {{
-                    ?identifier <http://rdf.insee.fr/def/geo#subdivisionDe> ?county .
-                    ?identifier <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdf.insee.fr/def/geo#Commune> .
-                    ?identifier <http://rdf.insee.fr/def/geo#nom> ?name .
-                    ?identifier <http://rdf.insee.fr/def/geo#codeINSEE> ?insee_code .
-                    ?state igeo:codeINSEE ?county_insee_code
+                    ?identifier igeo:subdivisionDe ?county .
+                    ?identifier rdf:type igeo:Commune .
+                    ?identifier igeo:nom ?name .
+                    ?identifier igeo:codeINSEE ?insee_code .
+                    ?county igeo:codeINSEE ?county_insee_code
                     FILTER( "{}" = STR(?county_insee_code))
             }}
         '''
         return query.format(pk)
 
-    def pre_update_items(self, items):
-        if isinstance(items, dict):
-            pass
-        elif isinstance(items, list):
-            for item in items:
-                item.update({
-                    'url': reverse('county-detail', args=[item.get('insee_code'), ], request=self.request)
-                })
-
     @detail_route(url_path='townships')
     def townships(self, request, pk):
-        return Response(self.sparql_query(self.get_townships_query(pk), True))
+        return Response(self.sparql_query(
+            self.get_townships_query(pk),
+            self.get_page(request),
+            True,
+            'township-detail'))
 
 
 class TownshipViewset(SparQLViewSet):
+    def get_detail_query(self, pk=None):
+        query = '''
+            SELECT ?prop ?value WHERE {{
+                    ?township rdf:type igeo:Commune .
+                    ?township igeo:nom ?name .
+                    ?township igeo:vivant true .
+                    ?township igeo:codeINSEE ?insee_code .
+                    ?prop rdfschema:label ?label .
+                    ?township ?prop ?value
+                    FILTER( "{}" = STR(?insee_code)) .
+                    FILTER( isLiteral(?value) )
+            }}
+            '''
+        return query.format(pk)
+
+
     def get_list_query(self):
         return '''
             SELECT ?identifier ?name ?insee_code WHERE {
