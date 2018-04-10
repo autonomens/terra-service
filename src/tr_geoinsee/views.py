@@ -122,10 +122,10 @@ class StateViewSet(SparQLViewSet):
     def get_counties_query(self, pk):
         query = '''
             SELECT ?identifier ?name ?insee_code WHERE {{
-                    ?identifier <http://rdf.insee.fr/def/geo#subdivisionDe> ?state .
-                    ?identifier <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdf.insee.fr/def/geo#Departement> .
-                    ?identifier <http://rdf.insee.fr/def/geo#nom> ?name .
-                    ?identifier <http://rdf.insee.fr/def/geo#codeINSEE> ?insee_code .
+                    ?identifier igeo:subdivisionDe ?state .
+                    ?identifier rdf:type igeo:Departement .
+                    ?identifier igeo:nom ?name .
+                    ?identifier igeo:codeINSEE ?insee_code .
                     ?state igeo:codeINSEE ?state_insee_code
                     FILTER( "{}" = STR(?state_insee_code))
             }}
