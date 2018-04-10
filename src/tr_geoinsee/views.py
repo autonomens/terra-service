@@ -66,6 +66,22 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def retrieve(self, request, pk=None):
         return Response(self.sparql_query(self.get_detail_query(pk), self.get_page(request)))
 
+    @detail_route(url_path='population')
+    def population_by_date(self, request, pk):
+        query = '''
+            SELECT ?date ?population WHERE {{
+                    ?township igeo:codeINSEE ?insee_code .
+                    ?township demo:population ?demo .
+                    ?demo demo:date ?date .
+                    ?demo demo:populationTotale ?population .
+                    FILTER( "{}" = STR(?insee_code)) .
+            }} ORDER BY DESC(?date)
+        '''
+        results = SparQLUtils.sparql_query(query.format(pk))
+        fields = SparQLUtils.get_query_fields(results)
+        return Response([SparQLUtils.get_fields_values(fields, item) 
+                for item in results.get('results', {}).get('bindings', {})])
+
 
 class StateViewSet(SparQLViewSet):
 
@@ -112,7 +128,8 @@ class StateViewSet(SparQLViewSet):
         return Response(self.sparql_query(
             self.get_counties_query(pk),
             self.get_page(request),
-            True, 'county-detail'))
+            True,
+            'county-detail'))
 
     def get_item_url(self, identifier):
         return reverse('county-detail', args=[identifier, ])
@@ -191,5 +208,3 @@ class TownshipViewset(SparQLViewSet):
                     ?identifier igeo:codeINSEE ?insee_code .
             }
         '''
-
-    

@@ -15,6 +15,7 @@ class SparQLUtils(object):
             PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX rdfschema:<http://www.w3.org/2000/01/rdf-schema#>
             PREFIX igeo:<http://rdf.insee.fr/def/geo#>
+            PREFIX demo:<http://rdf.insee.fr/def/demo#>
             {query}
         '''
 
