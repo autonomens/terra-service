@@ -17,6 +17,9 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def get_item_url(self, identifier):
         raise NotImplementedError("Please Implement this method")
 
+    def pre_update_items(self, items):
+        pass
+
     def sparql_query(self, query, page=1, many=False):
         results = SparQLUtils.sparql_query(query, self.page_size, self.page_size * (page - 1))
 
@@ -27,8 +30,10 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
             for item in results.get('results', {}).get('bindings', {}):
                 resultitem = resultlist.setdefault(item.get('identifier').get('value'), dict())
                 resultitem.update(SparQLUtils.get_fields_values(fields, item))
-            
-            serializer = SparQLSerializer(list(resultlist.values()), many=True)
+            resultlist = list(resultlist.values())
+
+            self.pre_update_items(resultlist)
+            serializer = SparQLSerializer(resultlist, many=True)
 
             return {
                 'links': {
@@ -43,6 +48,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
         for item in results.get('results', {}).get('bindings', {}):
             result.update(SparQLUtils.get_single_item_values(item))
 
+        self.pre_update_items(result)
         serializer = SparQLSerializer(result)
         return serializer.data
     
@@ -93,6 +99,15 @@ class StateViewSet(SparQLViewSet):
         '''
         return query.format(pk)
 
+    def pre_update_items(self, items):
+        if isinstance(items, dict):
+            pass
+        elif isinstance(items, list):
+            for item in items:
+                item.update({
+                    'url': reverse('state-detail', args=[item.get('insee_code'), ], request=self.request)
+                })
+
     @detail_route(url_path='counties')
     def counties(self, request, pk):
         return Response(self.sparql_query(self.get_counties_query(pk), True))
@@ -138,7 +153,16 @@ class CountyViewSet(SparQLViewSet):
             }}
         '''
         return query.format(pk)
-        
+
+    def pre_update_items(self, items):
+        if isinstance(items, dict):
+            pass
+        elif isinstance(items, list):
+            for item in items:
+                item.update({
+                    'url': reverse('county-detail', args=[item.get('insee_code'), ], request=self.request)
+                })
+
     @detail_route(url_path='townships')
     def townships(self, request, pk):
         return Response(self.sparql_query(self.get_townships_query(pk), True))
