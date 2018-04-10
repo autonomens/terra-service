@@ -3,7 +3,7 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from .serializers import StateSerializer, SparQLSerializer
+from .serializers import SparQLSerializer
 from .utils import SparQLUtils, PaginationMixin
 
 
@@ -20,19 +20,25 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def update_items_url(self, items, url_name):
         if isinstance(items, list) and url_name:
             for item in items:
-                item.update({
-                    'url': reverse(url_name, args=[item.get('insee_code'), ], request=self.request)
-                })
+                item.update(
+                    {
+                        'url': reverse(url_name,
+                                       args=[item.get('insee_code'), ],
+                                       request=self.request)
+                    }
+                )
 
     def sparql_query(self, query, page=1, many=False, item_url_name=None):
-        results = SparQLUtils.sparql_query(query, self.page_size, self.page_size * (page - 1))
+        results = SparQLUtils.sparql_query(
+            query, self.page_size, self.page_size * (page - 1))
 
         fields = SparQLUtils.get_query_fields(results)
 
         if many:
             resultlist = {}
             for item in results.get('results', {}).get('bindings', {}):
-                resultitem = resultlist.setdefault(item.get('identifier').get('value'), dict())
+                resultitem = resultlist.setdefault(
+                    item.get('identifier').get('value'), dict())
                 resultitem.update(SparQLUtils.get_fields_values(fields, item))
             resultlist = list(resultlist.values())
 
@@ -54,7 +60,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
 
         serializer = SparQLSerializer(result)
         return serializer.data
-    
+
     def list(self, request):
         return Response(self.sparql_query(
             self.get_list_query(),
@@ -64,7 +70,8 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
             ))
 
     def retrieve(self, request, pk=None):
-        return Response(self.sparql_query(self.get_detail_query(pk), self.get_page(request)))
+        return Response(self.sparql_query(
+            self.get_detail_query(pk), self.get_page(request)))
 
     @detail_route(url_path='population')
     def population_by_date(self, request, pk):
@@ -79,8 +86,10 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
         '''
         results = SparQLUtils.sparql_query(query.format(pk))
         fields = SparQLUtils.get_query_fields(results)
-        return Response([SparQLUtils.get_fields_values(fields, item) 
-                for item in results.get('results', {}).get('bindings', {})])
+        return Response(
+            [SparQLUtils.get_fields_values(fields, item)
+             for item in results.get('results', {}).get('bindings', {})]
+            )
 
 
 class StateViewSet(SparQLViewSet):
@@ -109,7 +118,7 @@ class StateViewSet(SparQLViewSet):
                     ?identifier igeo:codeINSEE ?insee_code .
             }
             '''
-        
+
     def get_counties_query(self, pk):
         query = '''
             SELECT ?identifier ?name ?insee_code WHERE {{
@@ -133,6 +142,7 @@ class StateViewSet(SparQLViewSet):
 
     def get_item_url(self, identifier):
         return reverse('county-detail', args=[identifier, ])
+
 
 class CountyViewSet(SparQLViewSet):
     def get_detail_query(self, pk=None):
@@ -197,7 +207,6 @@ class TownshipViewset(SparQLViewSet):
             }}
             '''
         return query.format(pk)
-
 
     def get_list_query(self):
         return '''

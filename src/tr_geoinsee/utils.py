@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 
 from rest_framework.utils.urls import replace_query_param
 
+
 class SparQLUtils(object):
     @staticmethod
     def sparql_query(query, limit=None, offset=None):
@@ -22,8 +23,10 @@ class SparQLUtils(object):
         format_keywords = {
             'query': query,
         }
-        
-        if isinstance(offset, numbers.Integral) and isinstance(limit, numbers.Integral):
+
+        if (isinstance(offset, numbers.Integral) and
+            isinstance(limit, numbers.Integral)):
+
             sparql_query += '''
                 LIMIT {limit}
                 OFFSET {offset}
@@ -45,22 +48,20 @@ class SparQLUtils(object):
         if 'identifier' in fields:
             fields.remove('identifier')
         return fields
-    
+
     @staticmethod
     def get_single_item_values(item):
-        prop =  item.get('prop').get('value')
-        return { prop[prop.rfind('#') + 1:]: item.get('value').get('value') }
-
+        prop = item.get('prop').get('value')
+        return {prop[prop.rfind('#') + 1:]: item.get('value').get('value')}
 
     @staticmethod
     def get_fields_values(fields, item):
-        return { field: item.get(field).get('value') for field in fields }
+        return {field: item.get(field).get('value') for field in fields}
 
 
 class PaginationMixin(object):
     page_size = 10
     page_query_param = 'page'
-
 
     @cached_property
     def count(self):
@@ -74,7 +75,8 @@ class PaginationMixin(object):
             count_query.format(self.get_list_query())
             )
         try:
-            return int(result.get('results', {}).get('bindings', {})[0].get('count', {}).get('value', 0))
+            return int(result.get('results', {}).get('bindings', {})[0]
+                       .get('count', {}).get('value', 0))
         except Exception:
             return 0
 
@@ -91,7 +93,6 @@ class PaginationMixin(object):
         return page if self.is_valid_page_number(page) else 1
 
     def is_valid_page_number(self, page):
-        url = self.request.build_absolute_uri()
         return 0 < page <= self.num_pages
 
     def get_next_page(self, current_page):
