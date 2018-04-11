@@ -9,10 +9,10 @@ class StateSerializer(serializers.Serializer):
 
 class SparQLSerializer(serializers.Serializer):
     def get_fields(self):
-        '''
+        """
         Set all fields as CharField based on first item of list in case of
         ListSerializer or instance item
-        '''
+        """
         if type(self.instance) is list:
             instance = self.instance[0]
         else:

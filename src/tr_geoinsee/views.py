@@ -39,9 +39,9 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
                 )
 
     def sparql_query(self, query, page=1, many=False, item_url_name=None):
-        '''
+        """
         Execute a query for a view and return formatted content
-        '''
+        """
         results = SparQLUtils.sparql_query(
             query, self.page_size, self.page_size * (page - 1))
 

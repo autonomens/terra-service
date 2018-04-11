@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 class SparQLUtils(object):
     @staticmethod
     def sparql_query(query, limit=None, offset=None):
-        '''
+        """
         Run a SparQL query on INSEE_API_URL endpoint with pre-defined
         prefixes and limit management
-        '''
+        """
         sparql_query = '''
             PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX rdfschema:<http://www.w3.org/2000/01/rdf-schema#>
@@ -50,7 +50,7 @@ class SparQLUtils(object):
 
     @staticmethod
     def get_query_fields(query):
-        ''' Return field list of a query '''
+        """ Return field list of a query """
         fields = query.get('head', {}).get('vars', [])
         if 'identifier' in fields:
             fields.remove('identifier')
@@ -58,13 +58,13 @@ class SparQLUtils(object):
 
     @staticmethod
     def get_single_item_values(item):
-        ''' return formatted content for single item query '''
+        """ return formatted content for single item query """
         prop = item.get('prop').get('value')
         return {prop[prop.rfind('#') + 1:]: item.get('value').get('value')}
 
     @staticmethod
     def get_fields_values(fields, item):
-        ''' return dict() of fields and associated values '''
+        """ return dict() of fields and associated values """
         return {field: item.get(field).get('value') for field in fields}
 
 
@@ -74,7 +74,7 @@ class PaginationMixin(object):
 
     @cached_property
     def count(self):
-        ''' Count of elements in a SparQL query '''
+        """ Count of elements in a SparQL query """
         count_query = '''
             SELECT (COUNT(*) AS ?count)
             WHERE {{
@@ -100,16 +100,16 @@ class PaginationMixin(object):
         return int(ceil(hits / float(self.page_size)))
 
     def get_page(self, request):
-        ''' return the current page number '''
+        """ return the current page number """
         page = int(request.GET.get('page')) if 'page' in request.GET else 1
         return page if self.is_valid_page_number(page) else 1
 
     def is_valid_page_number(self, page):
-        ''' test if the page number is legal '''
+        """ test if the page number is legal """
         return 0 < page <= self.num_pages
 
     def get_next_page(self, current_page):
-        ''' return next page url '''
+        """ return next page url """
         url = self.request.build_absolute_uri()
         page_number = current_page + 1
 
@@ -118,7 +118,7 @@ class PaginationMixin(object):
         return None
 
     def get_prev_page(self, current_page):
-        ''' return previous page url '''
+        """ return previous page url """
         url = self.request.build_absolute_uri()
         page_number = current_page - 1
 
