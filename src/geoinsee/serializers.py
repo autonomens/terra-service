@@ -13,7 +13,7 @@ class SparQLSerializer(serializers.Serializer):
         Set all fields as CharField based on first item of list in case of
         ListSerializer or instance item
         """
-        if type(self.instance) is list:
+        if isinstance(self.instance, list):
             instance = self.instance[0]
         else:
             instance = self.instance
