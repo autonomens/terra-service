@@ -1,3 +1,4 @@
+import logging
 from math import ceil
 import numbers
 
@@ -8,6 +9,7 @@ from django.utils.functional import cached_property
 
 from rest_framework.utils.urls import replace_query_param
 
+logger = logging.getLogger(__name__)
 
 class SparQLUtils(object):
     @staticmethod
@@ -85,7 +87,8 @@ class PaginationMixin(object):
         try:
             return int(result.get('results', {}).get('bindings', {})[0]
                        .get('count', {}).get('value', 0))
-        except Exception:
+        except Exception as e:
+            logger.warning("Error in SparQL result: {}".format(e))
             return 0
 
     @cached_property
