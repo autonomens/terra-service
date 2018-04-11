@@ -17,5 +17,5 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('api/', include('tr_geoinsee.urls')),
+    path('api/', include('geoinsee.urls')),
 ]
