@@ -8,6 +8,8 @@ from .utils import SparQLUtils, PaginationMixin
 
 
 class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
+    lookup_value_regex = '[0-9]+'
+
     def get_detail_query(self, pk=None):
         raise NotImplementedError("Please Implement this method")
 
