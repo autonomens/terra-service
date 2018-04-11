@@ -13,7 +13,7 @@ class SparQLUtils(object):
     @staticmethod
     def sparql_query(query, limit=None, offset=None):
         '''
-        Run a SparQL query on INSEE_SPARQL endpoint with pre-defined
+        Run a SparQL query on INSEE_API_URL endpoint with pre-defined
         prefixes and limit management
         '''
         sparql_query = '''
@@ -40,7 +40,7 @@ class SparQLUtils(object):
                 'offset': offset,
             })
 
-        sparql = SPARQLWrapper(settings.INSEE_SPARQL)
+        sparql = SPARQLWrapper(settings.INSEE_API_URL)
         sparql.setQuery(sparql_query.format(**format_keywords))
         sparql.setReturnFormat(JSON)
         raw_result = sparql.query()

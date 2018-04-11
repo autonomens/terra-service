@@ -106,4 +106,4 @@ MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
 # Just to be easily override by children conf files.
 LOGGING = copy.deepcopy(DEFAULT_LOGGING)
 
-INSEE_SPARQL = 'http://rdf.insee.fr/sparql'
+INSEE_API_URL = 'http://rdf.insee.fr/sparql'
