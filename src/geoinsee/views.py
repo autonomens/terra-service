@@ -22,7 +22,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def clean_fields(self, item):
         field_list = {
             'codeINSEE': 'insee',
-            'nom': 'nom',
+            'nom': 'name',
             'url': 'url',
         }
         return {
