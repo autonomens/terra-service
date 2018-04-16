@@ -22,6 +22,14 @@ PASSWORD_HASHERS = (
 for logger in six.itervalues(LOGGING['loggers']):  # noqa
     logger['handlers'] = ['console']
 
+# Fake db settings
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'test_db',
+    }
+}
+
 
 try:
     from .local import *  # noqa
