@@ -1,4 +1,3 @@
-import json
 import os
 
 import unittest
@@ -49,7 +48,8 @@ class SparQLUtilTestCase(SimpleTestCase):
                        'type': 'literal',
                        'value': 'true'}},
             {'prop': {'type': 'uri',
-                      'value': 'http://rdf.insee.fr/def/geo#nomCharniereClair'},
+                      'value':
+                      'http://rdf.insee.fr/def/geo#nomCharniereClair'},
              'value': {'type': 'literal',
                        'value': 'Île-de-France',
                        'xml:lang': 'fr'}},
@@ -74,7 +74,8 @@ class SparQLUtilTestCase(SimpleTestCase):
                        'type': 'literal',
                        'value': 'true'}},
             {'prop': {'type': 'uri',
-                      'value': 'http://rdf.insee.fr/def/geo#nomCharniereClair'},
+                      'value':
+                      'http://rdf.insee.fr/def/geo#nomCharniereClair'},
              'value': {'type': 'literal',
                        'value': 'Martinique',
                        'xml:lang': 'fr'}}]}}
@@ -104,7 +105,7 @@ class SparQLUtilTestCase(SimpleTestCase):
 
     def test_get_query_fields(self):
         qf = SparQLUtils.get_query_fields(self.sparql_data_items)
-        self.assertEqual(['prop','value'], qf)
+        self.assertEqual(['prop', 'value'], qf)
 
     def test_get_single_item_values(self):
         single_item = self.get_single_item()
@@ -118,7 +119,7 @@ class SparQLUtilTestCase(SimpleTestCase):
         )
 
     def test_get_fields_values(self):
-        
+
         fields = SparQLUtils.get_query_fields(self.sparql_data_items)
         item = self.get_single_item()
 
