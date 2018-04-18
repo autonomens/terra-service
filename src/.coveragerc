@@ -1,3 +1,6 @@
 [run]
 omit = */tests/*
         */migrations/*
+        manage.py
+        project/settings/*
+source = .
