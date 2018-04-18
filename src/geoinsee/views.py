@@ -16,9 +16,6 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def get_list_query(self):
         raise NotImplementedError("Please Implement this method")
 
-    def get_item_url(self, identifier):
-        raise NotImplementedError("Please Implement this method")
-    
     def clean_fields(self, item):
         field_list = {
             'codeINSEE': 'insee',
@@ -154,9 +151,6 @@ class StateViewSet(SparQLViewSet):
             self.get_page(request),
             True,
             'county-detail'))
-
-    def get_item_url(self, identifier):
-        return reverse('county-detail', args=[identifier, ])
 
 
 class CountyViewSet(SparQLViewSet):

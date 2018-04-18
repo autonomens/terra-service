@@ -86,6 +86,12 @@ def test_township_returned_fields(client):
     assert response.status_code == 200
     assert list(response.data.keys()) == ['insee', 'name']
 
+    """ Test population view """
+    response = client.get(reverse('township-population', args=[state_code]))
+    assert len(response.data) > 0
+    assert list(response.data[0].keys()) == ['date', 'population']
+
+
 def test_invalid_endpoint(client, settings):
     settings.INSEE_API_URL = 'http://my.failing.url/with/endpoint/'
 
