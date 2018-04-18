@@ -4,3 +4,7 @@ omit = */tests/*
         manage.py
         project/settings/*
 source = .
+
+[report]
+exclude_lines = 
+        raise NotImplementedError
