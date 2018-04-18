@@ -5,6 +5,7 @@ SPARQLWrapper>=1.8,<1.9
 opencage>=1.1,<1.2
 pytest
 pytest-django
+pytest-cov
 coverage
 
 # development
