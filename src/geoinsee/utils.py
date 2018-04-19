@@ -49,7 +49,7 @@ class SparQLUtils(object):
             raw_result = sparql.query()
             return raw_result.convert()
         except Exception as e:
-            logger.critical("A fatal error occured with SparQL endpoint: {}".format(e))
+            logger.exception("A fatal error occured with SparQL endpoint: {}".format(e))
             return {}
 
     @staticmethod
