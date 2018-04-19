@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class OpenCage(GeocodingAPI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.opencage = OpenCageGeocode(settings.OPENCAGE_KEY)
+        self.opencage = OpenCageGeocode(**settings.GEOCODING_OPTION)
 
     def get_cache_key(self, prefix, item):
         item_key = md5(item.encode('utf-8')).hexdigest()
