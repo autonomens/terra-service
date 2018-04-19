@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-class GeocodingAPI(metaclass=ABCMeta):
+class GeocodingBackend(metaclass=ABCMeta):
     @abstractmethod
     def geocode(self):
         pass

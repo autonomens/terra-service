@@ -6,11 +6,11 @@ from django.core.cache import cache
 
 from opencage.geocoder import OpenCageGeocode, RateLimitExceededError, InvalidInputError, UnknownError
 
-from . import GeocodingAPI
+from . import GeocodingBackend
 
 logger = logging.getLogger(__name__)
 
-class OpenCage(GeocodingAPI):
+class OpenCage(GeocodingBackend):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.opencage = OpenCageGeocode(**settings.GEOCODING_OPTION)
