@@ -19,7 +19,6 @@ class GeocodingFactory(object):
         try:
             module = import_string(settings.GEOCODING_PROVIDER)(*args, **kwargs)
         except ImportError as e:
-            print(e)
             raise Exception('GEOCODING_PROVIDE misconfigured or inexistant module')
 
         return module
