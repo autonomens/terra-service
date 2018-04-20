@@ -207,6 +207,54 @@ class CountyViewSet(SparQLViewSet):
             'township-detail'))
 
 
+class CantonViewSet(SparQLViewSet):
+    def get_detail_query(self, pk=None):
+        query = '''
+            SELECT ?prop ?value WHERE {{
+                	?canton rdf:type  igeo:Canton2015  .
+                    ?canton igeo:nom ?name .
+                    ?canton igeo:vivant true .
+                    ?canton igeo:codeINSEE ?insee .
+                    ?prop rdfschema:label ?label .
+                    ?canton ?prop ?value
+                    FILTER( "{}" = STR(?insee)) .
+                    FILTER( isLiteral(?value) )
+            }}
+            '''
+        return query.format(pk)
+
+    def get_list_query(self):
+        return '''
+            SELECT ?identifier ?name ?insee WHERE {
+                    ?identifier rdf:type igeo:Canton2015 .
+                    ?identifier igeo:nom ?name .
+                    ?identifier igeo:vivant true .
+                    ?identifier igeo:codeINSEE ?insee .
+            }
+            '''
+
+    def get_townships_query(self, pk):
+        query = '''
+            SELECT ?identifier ?name ?insee WHERE {{
+                    ?identifier igeo:subdivisionDe ?canton .
+                    ?identifier rdf:type igeo:Commune .
+                    ?identifier igeo:nom ?name .
+                    ?identifier igeo:codeINSEE ?insee .
+                    ?canton igeo:codeINSEE ?county_insee_code
+                    FILTER( "{}" = STR(?county_insee_code))
+            }}
+        '''
+        return query.format(pk)
+
+    @detail_route(url_path='townships')
+    def townships(self, request, pk):
+        return Response(self.sparql_query(
+            self.get_townships_query(pk),
+            self.get_page(request),
+            True,
+            'township-detail'))
+
+
 class TownshipViewset(SparQLViewSet):
     def get_detail_query(self, pk=None):
         query = '''
