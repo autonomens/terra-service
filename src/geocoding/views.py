@@ -6,7 +6,7 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 
 
-from .geocodingapi import GeocodingFactory
+from .backend import GeocodingFactory
 
 class GeocodingViewset(viewsets.ViewSet):
 
