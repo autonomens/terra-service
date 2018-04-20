@@ -132,5 +132,15 @@ class OpenCage(GeocodingBackend):
             except KeyError:
                 # if conversion fails again we should raise it
                 logger.exception("Fails to convert feat", repr(feat))
-
+        final_result['bbox'] = self.get_results_bounding_box(final_result)
         return final_result
+
+    def get_results_bounding_box(self, results): 
+        lngs = [r.get('geometry').get('coordinates')[0] for r in results.get('features')]
+        lats = [r.get('geometry').get('coordinates')[1] for r in results.get('features')]
+        return [
+            min(lngs) - 0.009,
+            min(lats) - 0.009,
+            max(lngs) + 0.009,
+            max(lats) + 0.009,
+        ]
