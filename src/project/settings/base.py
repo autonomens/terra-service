@@ -109,4 +109,4 @@ LOGGING = copy.deepcopy(DEFAULT_LOGGING)
 
 INSEE_API_URL = 'http://rdf.insee.fr/sparql'
 
-GEOCODING_PROVIDER = 'geocoding.geocodingapi.providers.OpenCage'
+GEOCODING_PROVIDER = 'geocoding.backend.providers.OpenCage'
