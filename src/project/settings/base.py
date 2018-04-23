@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'rest_framework',
     'geoinsee',
+    'geocoding',
 )
 
 MIDDLEWARE = (
@@ -107,3 +108,5 @@ MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
 LOGGING = copy.deepcopy(DEFAULT_LOGGING)
 
 INSEE_API_URL = 'http://rdf.insee.fr/sparql'
+
+GEOCODING_PROVIDER = 'geocoding.backend.providers.OpenCage'
