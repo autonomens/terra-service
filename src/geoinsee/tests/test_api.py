@@ -1,90 +1,122 @@
+import logging 
+
 from django.urls import reverse
-from django.test import SimpleTestCase
+
+logger = logging.getLogger(__name__)
+
+def test_state_returned_fields(client):
+    """ Test State views returned fields  """
+    response = client.get(reverse('state-list', ),)
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
+
+    state_code = response.data.get('results', [{}])[0].get('insee', None)
+
+    """
+    Test state detail view keys
+    """
+    response = client.get(reverse('state-detail', args=[state_code]))
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['insee', 'name']
+
+    """
+    Test counties list of a state result
+    """
+    response = client.get(reverse('state-counties',
+                                  args=[state_code]))
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
 
 
-class APIFieldsTestCase(SimpleTestCase):
+def test_county_returned_fields(client):
+    """ Test County views returned fields  """
+    response = client.get(reverse('county-list', ),)
 
-    def test_state_returned_fields(self):
-        """ Test State views returned fields  """
-        response = self.client.get(reverse('state-list', ),)
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()),
-                         ['links', 'count', 'results'])
-        self.assertEqual(list(response.data.get('results', [{}])[0].keys()),
-                         ['name', 'insee', 'url'])
+    state_code = response.data.get('results', [{}])[0].get('insee', None)
 
-        state_code = response.data.get('results', [{}])[0].get('insee', None)
+    # """
+    # Test county detail view keys
+    # """
+    response = client.get(reverse('county-detail', args=[state_code]))
 
-        """
-        Test state detail view keys
-        """
-        response = self.client.get(reverse('state-detail', args=[state_code]))
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['insee', 'name']
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()), ['insee', 'name'])
+    # """
+    # Test county list of a state result
+    # """
+    response = client.get(reverse('county-townships',
+                                  args=[state_code]))
 
-        """
-        Test counties list of a state result
-        """
-        response = self.client.get(reverse('state-counties',
-                                   args=[state_code]))
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()),
-                         ['links', 'count', 'results'])
-        self.assertEqual(list(response.data.get('results', [{}])[0].keys()),
-                         ['name', 'insee', 'url'])
 
-    def test_county_returned_fields(self):
-        """ Test County views returned fields  """
-        response = self.client.get(reverse('county-list', ),)
+def test_township_returned_fields(client):
+    """ Test Township views returned fields  """
+    response = client.get(reverse('township-list', ),)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()),
-                         ['links', 'count', 'results'])
-        self.assertEqual(list(response.data.get('results', [{}])[0].keys()),
-                         ['name', 'insee', 'url'])
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
 
-        state_code = response.data.get('results', [{}])[0].get('insee', None)
+    state_code = response.data.get('results', [{}])[0].get('insee', None)
 
-        """
-        Test county detail view keys
-        """
-        response = self.client.get(reverse('county-detail', args=[state_code]))
+    """
+    Test township detail view keys
+    """
+    response = client.get(reverse('township-detail',
+                                  args=[state_code]))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()), ['insee', 'name'])
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['insee', 'name']
 
-        """
-        Test county list of a state result
-        """
-        response = self.client.get(reverse('county-townships',
-                                   args=[state_code]))
+    """ Test population view """
+    response = client.get(reverse('township-population', args=[state_code]))
+    assert len(response.data) > 0
+    assert list(response.data[0].keys()) == ['date', 'population']
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()),
-                         ['links', 'count', 'results'])
-        self.assertEqual(list(response.data.get('results', [{}])[0].keys()),
-                         ['name', 'insee', 'url'])
 
-    def test_township_returned_fields(self):
-        """ Test Township views returned fields  """
-        response = self.client.get(reverse('township-list', ),)
+def test_invalid_endpoint(client, settings):
+    settings.INSEE_API_URL = 'http://my.failing.url/with/endpoint/'
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()),
-                         ['links', 'count', 'results'])
-        self.assertEqual(list(response.data.get('results', [{}])[0].keys()),
-                         ['name', 'insee', 'url'])
+    """
+    Test invalid endpoint response
+    """
+    response = client.get(reverse('state-list'))
+    assert response.status_code == 200
+    assert response.data.get('count') == 0
+    assert len(response.data.get('results')) == 0
 
-        state_code = response.data.get('results', [{}])[0].get('insee', None)
+    """
+    Test pagination with invalid backend datas so it's and invalid
+    page number
+    """
+    response = client.get(reverse('state-list'), {'page': 2})
+    assert response.data.get('count') == 0
+    assert response.data.get('links').get('next') is None
+    assert response.data.get('links').get('previous') is None
 
-        """
-        Test township detail view keys
-        """
-        response = self.client.get(reverse('township-detail',
-                                   args=[state_code]))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.data.keys()), ['insee', 'name'])
+def test_page_two(client):
+    """
+    Test links header in page 2: previous and next pages must be 
+    present in this view
+    """
+    response = client.get(reverse('township-list'), {'page': 2})
+    assert response.data.get('links').get('next') is not None
+    assert response.data.get('links').get('previous') is not None

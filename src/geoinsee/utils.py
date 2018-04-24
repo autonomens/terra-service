@@ -42,11 +42,15 @@ class SparQLUtils(object):
                 'offset': offset,
             })
 
-        sparql = SPARQLWrapper(settings.INSEE_API_URL)
-        sparql.setQuery(sparql_query.format(**format_keywords))
-        sparql.setReturnFormat(JSON)
-        raw_result = sparql.query()
-        return raw_result.convert()
+        try:
+            sparql = SPARQLWrapper(settings.INSEE_API_URL)
+            sparql.setQuery(sparql_query.format(**format_keywords))
+            sparql.setReturnFormat(JSON)
+            raw_result = sparql.query()
+            return raw_result.convert()
+        except Exception as e:
+            logger.exception("A fatal error occured with SparQL endpoint: {}".format(e))
+            return {}
 
     @staticmethod
     def get_query_fields(query):
@@ -81,10 +85,11 @@ class PaginationMixin(object):
                 {}
             }}
         '''
-        result = SparQLUtils.sparql_query(
-            count_query.format(self.get_list_query())
-            )
         try:
+            result = SparQLUtils.sparql_query(
+                count_query.format(self.get_list_query())
+            )
+
             return int(result.get('results', {}).get('bindings', {})[0]
                        .get('count', {}).get('value', 0))
         except Exception as e:
