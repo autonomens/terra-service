@@ -107,6 +107,12 @@ MEDIA_ROOT = os.path.join(PUBLIC_DIR, 'media')
 # Just to be easily override by children conf files.
 LOGGING = copy.deepcopy(DEFAULT_LOGGING)
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'permissions.IsJWTAuthenticated',
+    )
+}
+
 INSEE_API_URL = 'http://rdf.insee.fr/sparql'
 
 GEOCODING_PROVIDER = 'geocoding.backend.providers.OpenCage'
