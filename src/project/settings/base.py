@@ -116,3 +116,8 @@ REST_FRAMEWORK = {
 INSEE_API_URL = 'http://rdf.insee.fr/sparql'
 
 GEOCODING_PROVIDER = 'geocoding.backend.providers.OpenCage'
+
+# Code SRID for projection in database
+# Check https://epsg.io/3857
+SRID = 3857
+
