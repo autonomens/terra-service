@@ -21,3 +21,5 @@ DATABASES = {
 # MEDIA_URL = '/media/'
 
 GEOCODING_OPTION = {}
+
+JWT_TOKEN_VERIFY_URL = 'http://terra-back/api/auth/verify-token/'
