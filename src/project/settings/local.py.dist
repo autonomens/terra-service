@@ -22,4 +22,6 @@ DATABASES = {
 
 GEOCODING_OPTION = {}
 
+GEOIP_PATH = '/tmp/geoip/'
+
 JWT_TOKEN_VERIFY_URL = 'http://terra-back/api/auth/verify-token/'
