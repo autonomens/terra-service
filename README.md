@@ -36,7 +36,15 @@ docker-compose run --rm django /code/venv/bin/python3.6 ./manage.py migrate
 docker-compose run --rm django /code/venv/bin/python3.6 ./manage.py createsuperuser
 ```
 
-### Generate API Token
+### API Token missing ?
+
+In `project/settings/local.py`, you could overrides permissions for REST framework, just uncomment these lines:
+
+```
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ()
+}
+```
 
 ## Usage
 
