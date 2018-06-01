@@ -305,6 +305,6 @@ class AdministrativeEntityViewset(viewsets.ModelViewSet, PaginationMixin):
 
     def get_serializer_class(self):
         """Get serializer according to with_geom parameter"""
-        if 'with_geom' in self.request.query_params:
+        if self.action != "list" or 'with_geom' in self.request.query_params:
             return GeomAdministrativeEntitySerializer
         return AdministrativeEntitySerializer
