@@ -1,5 +1,6 @@
 # coding: utf8
 from rest_framework import serializers, fields
+from rest_framework.reverse import reverse
 from .models import AdministrativeEntity
 
 
@@ -23,17 +24,22 @@ class SparQLSerializer(serializers.Serializer):
 
 class AdministrativeEntitySerializer(serializers.ModelSerializer):
 
-    url = serializers.CharField(source='get_absolute_url', read_only=True)
-
+    url = serializers.SerializerMethodField()
     class Meta:
         model = AdministrativeEntity
-        fields = ('id', 'name', 'insee', 'url')
+        fields = ('name', 'insee', 'url')
+
+    def get_url(self, obj):
+        return reverse('entity-detail',
+                args=[obj.id])
 
 
 class GeomAdministrativeEntitySerializer(serializers.ModelSerializer):
-
-    url = serializers.CharField(source='get_absolute_url', read_only=True)
-
+    url = serializers.SerializerMethodField()
     class Meta:
         model = AdministrativeEntity
-        fields = ('id', 'name', 'insee', 'geom', 'url')
+        fields = ('name', 'insee', 'geom', 'url')
+
+    def get_url(self, obj):
+        return reverse('entity-detail',
+                args=[obj.id])
