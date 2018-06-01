@@ -27,5 +27,13 @@ class AdministrativeEntitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AdministrativeEntity
-        fields = ('id', 'name', 'insee', 'geom', 'url')
+        fields = ('id', 'name', 'insee', 'url')
 
+
+class GeomAdministrativeEntitySerializer(serializers.ModelSerializer):
+
+    url = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    class Meta:
+        model = AdministrativeEntity
+        fields = ('id', 'name', 'insee', 'geom', 'url')

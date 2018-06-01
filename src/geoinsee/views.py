@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from .models import AdministrativeEntity
-from .serializers import SparQLSerializer, AdministrativeEntitySerializer
+from .serializers import SparQLSerializer, AdministrativeEntitySerializer, GeomAdministrativeEntitySerializer
 from .utils import SparQLUtils, PaginationMixin
 
 
@@ -302,4 +302,9 @@ class AdministrativeEntityViewset(viewsets.ModelViewSet, PaginationMixin):
     """Viewset for Administrative entity model
     """
     queryset = AdministrativeEntity.objects.all()
-    serializer_class = AdministrativeEntitySerializer
+
+    def get_serializer_class(self):
+        """Get serializer according to with_geom parameter"""
+        if 'with_geom' in self.request.query_params:
+            return GeomAdministrativeEntitySerializer
+        return AdministrativeEntitySerializer
