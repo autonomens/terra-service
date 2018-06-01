@@ -3,7 +3,8 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from .serializers import SparQLSerializer
+from .models import AdministrativeEntity
+from .serializers import SparQLSerializer, AdministrativeEntitySerializer
 from .utils import SparQLUtils, PaginationMixin
 
 
@@ -295,3 +296,10 @@ class OverpassAPIViewSet(viewsets.ViewSet, PaginationMixin):
         """Request to overpass"""
         
         pass
+
+
+class AdministrativeEntityViewset(viewsets.ModelViewSet, PaginationMixin):
+    """Viewset for Administrative entity model
+    """
+    queryset = AdministrativeEntity.objects.all()
+    serializer_class = AdministrativeEntitySerializer

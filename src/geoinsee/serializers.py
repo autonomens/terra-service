@@ -1,5 +1,6 @@
 # coding: utf8
 from rest_framework import serializers, fields
+from .models import AdministrativeEntity
 
 
 class StateSerializer(serializers.Serializer):
@@ -18,3 +19,13 @@ class SparQLSerializer(serializers.Serializer):
         else:
             instance = self.instance
         return {key: fields.CharField() for key in dict(instance).keys()}
+
+
+class AdministrativeEntitySerializer(serializers.ModelSerializer):
+
+    url = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    class Meta:
+        model = AdministrativeEntity
+        fields = ('id', 'name', 'insee', 'geom', 'url')
+
