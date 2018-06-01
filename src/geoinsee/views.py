@@ -277,27 +277,6 @@ class TownshipViewset(SparQLViewSet):
         '''
 
 
-class OverpassAPIViewSet(viewsets.ViewSet, PaginationMixin):
-    """Base class to request OverpassAPI"""
-
-    def get_detail_query(self):
-        query = '''
-            [out:json];
-            rel["ref:INSEE"="76"]["name:fr"="Occitanie"];
-            out geom;
-            '''
-        return query
-
-    def list(self, request):
-        """Liste query"""
-        pass
-
-    def retrieve(self, request, pk=None):
-        """Request to overpass"""
-        
-        pass
-
-
 class AdministrativeEntityViewset(viewsets.ModelViewSet, PaginationMixin):
     """Viewset for Administrative entity model
     """
