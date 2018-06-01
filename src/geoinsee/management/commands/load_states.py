@@ -33,6 +33,8 @@ class Command(BaseCommand):
         logger.info('%s states found' % len(geometry))
 
         for i, geom in enumerate(geometry):
-            entity, _ = AdministrativeEntity.objects.update_or_create(geom=geom,
-                                                                      name=name[i], insee=insee_code[i])
+            entity, _ = AdministrativeEntity.objects.update_or_create(
+                insee=insee_code[i],
+                defaults={'geom': geom, 'name': name[i]}
+            )
         self.stdout.write('DONE')
