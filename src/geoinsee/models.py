@@ -24,7 +24,7 @@ class AdministrativeEntity(models.Model):
     )
     name = models.CharField(blank=False, max_length=163, help_text=_('Administrative Entity name'))
     insee = models.CharField(max_length=5, blank=False, help_text='Insee Code')
-    entity_type = models.CharField(null=False, default=None,
+    entity_type = models.CharField(null=False,
         max_length=15, choices=ENTITY_TYPE_CHOICES, help_text=_('Administrative area type'))
     geom = models.GeometryField(dim=2, srid=settings.SRID, spatial_index=False, editable=False, null=False, default=None)
 
