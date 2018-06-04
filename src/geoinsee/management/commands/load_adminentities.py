@@ -16,10 +16,12 @@ class Command(BaseCommand):
         parser.add_argument('shapefile', type=argparse.FileType('rb'))
         parser.add_argument('--encoding', default='utf-8',
                             help='Specify encoding (utf-8 by default)')
+        parser.add_argument('--area-type', help='Specify administrative area type')
 
     def handle(self, *args, **options):
         shapefile = options.get('shapefile')
         encoding = options.get('encoding')
+        entity_type = options.get('area-type')
         datasource = DataSource(shapefile.name, encoding=encoding)
         count = datasource.layer_count
 
@@ -36,6 +38,7 @@ class Command(BaseCommand):
         for i, geom in enumerate(geometry):
             entity, _ = AdministrativeEntity.objects.update_or_create(
                 insee=insee_code[i],
+                entity_type=entity_type,
                 defaults={'geom': geom, 'name': name[i]}
             )
         self.stdout.write('DONE')
