@@ -16,15 +16,15 @@ class Command(BaseCommand):
         parser.add_argument('shapefile', type=argparse.FileType('rb'))
         parser.add_argument('--encoding', default='utf-8',
                             help='Specify encoding (utf-8 by default)')
-        parser.add_argument('--area-type', help='Specify administrative area type')
+        parser.add_argument(
+            '--area-type', help='Specify administrative area type', required=False)
 
     def handle(self, *args, **options):
         shapefile = options.get('shapefile')
         encoding = options.get('encoding')
-        entity_type = options.get('area-type')
+        entity_type = options.get('area_type')
         datasource = DataSource(shapefile.name, encoding=encoding)
         count = datasource.layer_count
-
         logger.info('%s layers found' % count)
         geometry, name, insee_code = ([] for i in range(3))
 
