@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.gis.gdal import DataSource
-import os
+import argparse
 import logging
+import os
+
+from django.contrib.gis.gdal import DataSource
+from django.core.management.base import BaseCommand, CommandError
 from geoinsee.models import AdministrativeEntity, ZIPCode
 
 logger = logging.getLogger(__name__)
@@ -11,15 +13,13 @@ class Command(BaseCommand):
     help = "Load states from shapefiles in database"
 
     def add_arguments(self, parser):
-        parser.add_argument('shapefile')
+        parser.add_argument('shapefile', type=argparse.FileType('rb'))
+        parser.add_argument('--encoding', default='utf-8', help='Specify encoding (utf-8 by default)')
 
     def handle(self, *args, **options):
-        filename = options.get('shapefile')
-        if not filename:
-            raise CommandError('You need to give a shapefile with this command')
-        if not os.path.exists(filename):
-            raise CommandError('File does not exists at: %s' % filename)
-        datasource = DataSource(filename, 1)
+        shapefile = options.get('shapefile')
+        encoding = options.get('encoding')
+        datasource = DataSource(shapefile.name, encoding=encoding)
         count = datasource.layer_count
 
         logger.info('%s layers found' % count)
