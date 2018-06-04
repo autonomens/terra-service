@@ -30,11 +30,16 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
     def update_items_url(self, items, url_name):
         if isinstance(items, list) and url_name:
             for item in items:
+                item_db = AdministrativeEntity.objects.filter(insee=item['insee'], name=item['name'])
+                item_geom = ''
+                if item_db:
+                    item_geom = item_db[0].geom
                 item.update(
                     {
                         'url': reverse(url_name,
                                        args=[item.get('insee'), ],
-                                       request=self.request)
+                                       request=self.request),
+                        'geom': item_geom
                     }
                 )
 
