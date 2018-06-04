@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Load states from shapefiles in database"
+    help = "Load administrative entities from shapefiles in database"
 
     def add_arguments(self, parser):
         parser.add_argument('shapefile', type=argparse.FileType('rb'))
