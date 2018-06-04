@@ -14,7 +14,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('shapefile', type=argparse.FileType('rb'))
-        parser.add_argument('--encoding', default='utf-8', help='Specify encoding (utf-8 by default)')
+        parser.add_argument('--encoding', default='utf-8',
+                            help='Specify encoding (utf-8 by default)')
 
     def handle(self, *args, **options):
         shapefile = options.get('shapefile')
