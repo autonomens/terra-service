@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.pagination import PageNumberPagination
 
 from .models import AdministrativeEntity
 from .serializers import SparQLSerializer, AdministrativeEntitySerializer, GeomAdministrativeEntitySerializer
@@ -294,10 +295,11 @@ class TownshipViewset(SparQLViewSet):
         '''
 
 
-class AdministrativeEntityViewset(viewsets.ModelViewSet, PaginationMixin):
+class AdministrativeEntityViewset(viewsets.ModelViewSet):
     """Viewset for Administrative entity model
     """
     queryset = AdministrativeEntity.objects.all()
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         """Get serializer according to with_geom parameter"""
