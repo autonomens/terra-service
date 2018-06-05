@@ -23,7 +23,6 @@ class SparQLSerializer(serializers.Serializer):
 
 
 class AdministrativeEntitySerializer(serializers.ModelSerializer):
-
     url = serializers.SerializerMethodField()
     class Meta:
         model = AdministrativeEntity
