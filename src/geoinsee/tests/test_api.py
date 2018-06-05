@@ -14,6 +14,14 @@ def test_state_returned_fields(client, db):
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
 
+    """
+    Test State with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('state-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
+
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
     """
@@ -45,6 +53,14 @@ def test_county_returned_fields(client, db):
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
 
+    """
+    Test County with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('county-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
+
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
     # """
@@ -75,6 +91,14 @@ def test_township_returned_fields(client, db):
     assert list(response.data.keys()) == ['links', 'count', 'results']
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
+
+    """
+    Test Township with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('township-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
 
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
@@ -133,6 +157,12 @@ def test_entity_endpoint(client, db):
     assert response.status_code == 200
     assert (list(response.data[0].keys()) ==
             ['name', 'insee', 'url'])
+
+    response = client.get("{}?with_geom".format(reverse('entity-list', ),))
+
+    assert response.status_code == 200
+    assert (list(response.data[0].keys()) ==
+            ['name', 'insee', 'geom', 'url'])
 
     """
     Test state detail view keys
