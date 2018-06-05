@@ -4,7 +4,7 @@ from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
-def test_state_returned_fields(client, django_db):
+def test_state_returned_fields(client, db):
     """ Test State views returned fields  """
     response = client.get(reverse('state-list', ),)
 
@@ -35,7 +35,7 @@ def test_state_returned_fields(client, django_db):
             ['name', 'insee', 'url'])
 
 
-def test_county_returned_fields(client, django_db):
+def test_county_returned_fields(client, db):
     """ Test County views returned fields  """
     response = client.get(reverse('county-list', ),)
 
@@ -66,7 +66,7 @@ def test_county_returned_fields(client, django_db):
             ['name', 'insee', 'url'])
 
 
-def test_township_returned_fields(client, django_db):
+def test_township_returned_fields(client, db):
     """ Test Township views returned fields  """
     response = client.get(reverse('township-list', ),)
 
@@ -120,3 +120,24 @@ def test_page_two(client):
     response = client.get(reverse('township-list'), {'page': 2})
     assert response.data.get('links').get('next') is not None
     assert response.data.get('links').get('previous') is not None
+
+def test_entity_endpoint(client, db):
+    """
+    Test Entity views returned fields
+    """
+    response = client.get(reverse('entity-list', ),)
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['links', 'count', 'results']
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url'])
+
+    state_code = response.data.get('results', [{}])[0].get('insee', None)
+
+    """
+    Test state detail view keys
+    """
+    response = client.get(reverse('entity-detail', args=[state_code]))
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['insee', 'name']
