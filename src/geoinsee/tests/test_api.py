@@ -4,7 +4,7 @@ from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
-def test_state_returned_fields(client):
+def test_state_returned_fields(client, django_db):
     """ Test State views returned fields  """
     response = client.get(reverse('state-list', ),)
 
@@ -35,7 +35,7 @@ def test_state_returned_fields(client):
             ['name', 'insee', 'url'])
 
 
-def test_county_returned_fields(client):
+def test_county_returned_fields(client, django_db):
     """ Test County views returned fields  """
     response = client.get(reverse('county-list', ),)
 
@@ -66,7 +66,7 @@ def test_county_returned_fields(client):
             ['name', 'insee', 'url'])
 
 
-def test_township_returned_fields(client):
+def test_township_returned_fields(client, django_db):
     """ Test Township views returned fields  """
     response = client.get(reverse('township-list', ),)
 
