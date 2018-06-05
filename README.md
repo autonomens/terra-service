@@ -58,4 +58,12 @@ To have pdb support launch django container with
 
 ```bash
 docker-compose run --rm --service-ports django
+
+```
+## Tests
+
+Run
+
+```
+pytest
 ```
