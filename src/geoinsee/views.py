@@ -94,8 +94,14 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
             ))
 
     def retrieve(self, request, pk=None):
-        return Response(self.sparql_query(
-            self.get_detail_query(pk), self.get_page(request)))
+        item = self.sparql_query(
+            self.get_detail_query(pk), self.get_page(request))
+        item_db = AdministrativeEntity.objects.filter(
+            insee=pk, name=item['name'])
+        if item_db:
+            item_geom = item_db[0].geom.geojson
+            item.update({'geom': item_geom})
+        return Response(item)
 
     @detail_route(url_path='population')
     def population_by_date(self, request, pk):
