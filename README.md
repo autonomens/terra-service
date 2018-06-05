@@ -41,6 +41,13 @@ docker-compose run --rm django /code/venv/bin/python3.6 ./manage.py createsuperu
 ## Usage
 
 After setted the netrc and docker.env, to run with docker, just type :
+
 ```bash
 $ docker-compose start
+```
+
+To have pdb support launch django container with
+
+```bash
+docker-compose run --rm --service-ports django
 ```
