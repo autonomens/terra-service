@@ -1,6 +1,7 @@
 import logging 
 
 from django.urls import reverse
+from geoinsee.models import AdministrativeEntity
 
 logger = logging.getLogger(__name__)
 
@@ -125,19 +126,18 @@ def test_entity_endpoint(client, db):
     """
     Test Entity views returned fields
     """
+    entity = AdministrativeEntity(insee=10, name='Aube', geom="POINT(3.694590831032181 48.15488686123513)" )
+    entity.save()
     response = client.get(reverse('entity-list', ),)
 
     assert response.status_code == 200
-    assert list(response.data.keys()) == ['links', 'count', 'results']
-    assert (list(response.data.get('results', [{}])[0].keys()) ==
+    assert (list(response.data[0].keys()) ==
             ['name', 'insee', 'url'])
-
-    state_code = response.data.get('results', [{}])[0].get('insee', None)
 
     """
     Test state detail view keys
     """
-    response = client.get(reverse('entity-detail', args=[state_code]))
+    response = client.get(response.data[0].get('url'))
 
     assert response.status_code == 200
-    assert list(response.data.keys()) == ['insee', 'name']
+    assert list(response.data.keys()) == ['name', 'insee', 'geom', 'url']
