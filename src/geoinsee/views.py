@@ -44,11 +44,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
                     item_geom = ''
                     if item_db:
                         item_geom = item_db[0].geom
-                    item.update(
-                        {
-                            'geom': item_geom
-                        }
-                    )
+                    item['geom'] = item_geom
 
     def sparql_query(self, query, page=1, many=False, item_url_name=None):
         """
@@ -101,7 +97,7 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
             insee=pk, name=item['name'])
         if item_db:
             item_geom = item_db[0].geom.geojson
-            item.update({'geom': item_geom})
+            item['geom'] = item_geom
         return Response(item)
 
     @detail_route(url_path='population')
