@@ -20,4 +20,5 @@ urlpatterns = [
     path('api/geocoding/', include('geocoding.urls')),
     path('api/geoinsee/', include('geoinsee.urls')),
     path('api/geoip/', include('geoip.urls')),
+    path('admin/', admin.site.urls),
 ]

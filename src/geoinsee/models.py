@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 
 
 class AdministrativeEntity(models.Model):
-
     ENTITY_TYPE_TOWN = 'township'
     ENTITY_TYPE_SCOT = 'scot'
     ENTITY_TYPE_EPCI = 'epci'
@@ -22,6 +21,7 @@ class AdministrativeEntity(models.Model):
         (ENTITY_TYPE_STATE, _('State')), # US
         (ENTITY_TYPE_COUNTRY, _('Country')),
     )
+
     name = models.CharField(blank=False, max_length=163, help_text=_('Administrative Entity name'))
     insee = models.CharField(max_length=5, blank=False, help_text='Insee Code')
     entity_type = models.CharField(null=False,
@@ -30,6 +30,9 @@ class AdministrativeEntity(models.Model):
 
     class Meta:
         unique_together = ('insee', 'entity_type',)
+
+    def __str__(self):
+        return self.name
 
 
 class ZIPCode(models.Model):

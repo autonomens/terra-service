@@ -1,10 +1,11 @@
 import logging 
 
 from django.urls import reverse
+from geoinsee.models import AdministrativeEntity
 
 logger = logging.getLogger(__name__)
 
-def test_state_returned_fields(client):
+def test_state_returned_fields(client, db):
     """ Test State views returned fields  """
     response = client.get(reverse('state-list', ),)
 
@@ -12,6 +13,14 @@ def test_state_returned_fields(client):
     assert list(response.data.keys()) == ['links', 'count', 'results']
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
+
+    """
+    Test State with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('state-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
 
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
@@ -35,7 +44,7 @@ def test_state_returned_fields(client):
             ['name', 'insee', 'url'])
 
 
-def test_county_returned_fields(client):
+def test_county_returned_fields(client, db):
     """ Test County views returned fields  """
     response = client.get(reverse('county-list', ),)
 
@@ -43,6 +52,14 @@ def test_county_returned_fields(client):
     assert list(response.data.keys()) == ['links', 'count', 'results']
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
+
+    """
+    Test County with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('county-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
 
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
@@ -66,7 +83,7 @@ def test_county_returned_fields(client):
             ['name', 'insee', 'url'])
 
 
-def test_township_returned_fields(client):
+def test_township_returned_fields(client, db):
     """ Test Township views returned fields  """
     response = client.get(reverse('township-list', ),)
 
@@ -74,6 +91,14 @@ def test_township_returned_fields(client):
     assert list(response.data.keys()) == ['links', 'count', 'results']
     assert (list(response.data.get('results', [{}])[0].keys()) ==
             ['name', 'insee', 'url'])
+
+    """
+    Test Township with geom
+    """
+    response = client.get("{}?with_geom".format(reverse('township-list', ),))
+    assert response.status_code == 200
+    assert (list(response.data.get('results', [{}])[0].keys()) ==
+            ['name', 'insee', 'url', 'geom'])
 
     state_code = response.data.get('results', [{}])[0].get('insee', None)
 
@@ -120,3 +145,29 @@ def test_page_two(client):
     response = client.get(reverse('township-list'), {'page': 2})
     assert response.data.get('links').get('next') is not None
     assert response.data.get('links').get('previous') is not None
+
+def test_entity_endpoint(client, db):
+    """
+    Test Entity views returned fields
+    """
+    entity = AdministrativeEntity(insee=10, name='Aube', geom="POINT(3.694590831032181 48.15488686123513)" )
+    entity.save()
+    response = client.get(reverse('entity-list', ),)
+
+    assert response.status_code == 200
+    assert (list(response.data[0].keys()) ==
+            ['name', 'insee', 'url'])
+
+    response = client.get("{}?with_geom".format(reverse('entity-list', ),))
+
+    assert response.status_code == 200
+    assert (list(response.data[0].keys()) ==
+            ['name', 'insee', 'geom', 'url'])
+
+    """
+    Test state detail view keys
+    """
+    response = client.get(response.data[0].get('url'))
+
+    assert response.status_code == 200
+    assert list(response.data.keys()) == ['name', 'insee', 'geom', 'url']

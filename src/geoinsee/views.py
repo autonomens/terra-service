@@ -2,8 +2,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.pagination import PageNumberPagination
 
-from .serializers import SparQLSerializer
+from .models import AdministrativeEntity
+from .serializers import SparQLSerializer, AdministrativeEntitySerializer, GeomAdministrativeEntitySerializer
 from .utils import SparQLUtils, PaginationMixin
 
 
@@ -27,15 +29,22 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
         }
 
     def update_items_url(self, items, url_name):
+        with_geom = 'with_geom' in self.request.query_params
         if isinstance(items, list) and url_name:
             for item in items:
                 item.update(
                     {
                         'url': reverse(url_name,
                                        args=[item.get('insee'), ],
-                                       request=self.request)
+                                       request=self.request),
                     }
                 )
+                if with_geom:
+                    item_db = AdministrativeEntity.objects.filter(insee=item['insee'], name=item['name'])
+                    item_geom = ''
+                    if item_db:
+                        item_geom = item_db[0].geom
+                    item['geom'] = item_geom
 
     def sparql_query(self, query, page=1, many=False, item_url_name=None):
         """
@@ -82,8 +91,14 @@ class SparQLViewSet(viewsets.ViewSet, PaginationMixin):
             ))
 
     def retrieve(self, request, pk=None):
-        return Response(self.sparql_query(
-            self.get_detail_query(pk), self.get_page(request)))
+        item = self.sparql_query(
+            self.get_detail_query(pk), self.get_page(request))
+        item_db = AdministrativeEntity.objects.filter(
+            insee=pk, name=item['name'])
+        if item_db:
+            item_geom = item_db[0].geom.geojson
+            item['geom'] = item_geom
+        return Response(item)
 
     @detail_route(url_path='population')
     def population_by_date(self, request, pk):
@@ -274,3 +289,16 @@ class TownshipViewset(SparQLViewSet):
                     ?identifier igeo:codeINSEE ?insee .
             }
         '''
+
+
+class AdministrativeEntityViewset(viewsets.ModelViewSet):
+    """Viewset for Administrative entity model
+    """
+    queryset = AdministrativeEntity.objects.all()
+    pagination_class = PageNumberPagination
+
+    def get_serializer_class(self):
+        """Get serializer according to with_geom parameter"""
+        if self.action != "list" or 'with_geom' in self.request.query_params:
+            return GeomAdministrativeEntitySerializer
+        return AdministrativeEntitySerializer
